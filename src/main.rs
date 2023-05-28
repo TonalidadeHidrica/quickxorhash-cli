@@ -6,11 +6,14 @@ use std::{
 use base64::{prelude::BASE64_STANDARD, Engine};
 use clap::Parser;
 use fs_err::File;
+use indicatif::ProgressBar;
 use quickxorhash::QuickXorHash;
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let f = File::open(args.input)?;
+    let len = f.metadata()?.len();
+    let bar = args.progress.then(|| ProgressBar::new(len));
     let mut reader = BufReader::new(f);
 
     let mut buffer = [0u8; 0x100000];
@@ -18,7 +21,12 @@ fn main() -> anyhow::Result<()> {
     loop {
         match reader.read(&mut buffer)? {
             0 => break,
-            n => hasher.update(&buffer[..n]),
+            n => {
+                hasher.update(&buffer[..n]);
+                if let Some(bar) = bar.as_ref() {
+                    bar.inc(n as _);
+                }
+            }
         }
     }
 
@@ -32,4 +40,6 @@ fn main() -> anyhow::Result<()> {
 #[derive(Parser)]
 struct Args {
     input: PathBuf,
+    #[clap(long)]
+    progress: bool,
 }

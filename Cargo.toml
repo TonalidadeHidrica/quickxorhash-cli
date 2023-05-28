@@ -10,4 +10,5 @@ anyhow = "1.0.71"
 base64 = "0.21.2"
 clap = { version = "4.3.0", features = ["derive"] }
 fs-err = "2.9.0"
+indicatif = "0.17.3"
 quickxorhash = "0.1.0"
