@@ -28,7 +28,7 @@ fn main() -> anyhow::Result<()> {
     });
     let mut reader = BufReader::new(f);
 
-    let mut buffer = [0u8; 0x100000];
+    let mut buffer = vec![0u8; 0x100000];
     let mut hasher = QuickXorHash::new();
     loop {
         match reader.read(&mut buffer)? {
